@@ -20,8 +20,24 @@ class BurgerBuilder extends Component {
         cheese: 0,
         meat: 0
       },
-      totalPrice: 4
+      totalPrice: 4,
+      isPurchasable: false
     };
+  }
+
+  /*
+  Set the isPurchasable state property to either true or false, depending on
+  whether or not any of the ingredients in the ingredients state property have
+  a value greater than 0. The value of isPurchasable will determine whether or
+  not the order button should be disabled.
+  */
+  updatePurchaseState() {
+    for (const ingKey in this.state.ingredients) {
+      if (this.state.ingredients[ingKey] > 0) {
+        return this.setState({ isPurchasable: true });
+      }
+    }
+    this.setState({ isPurchasable: false });
   }
 
   addIngredientHandler = type => {
@@ -46,10 +62,13 @@ class BurgerBuilder extends Component {
     const newTotalPrice = oldTotalPrice + addedPrice;
 
     // Update the state with the new values
-    this.setState({
-      ingredients: updatedIngredients,
-      totalPrice: newTotalPrice
-    });
+    this.setState(
+      {
+        ingredients: updatedIngredients,
+        totalPrice: newTotalPrice
+      },
+      this.updatePurchaseState
+    );
   };
 
   removeIngredientHandler = type => {
@@ -77,10 +96,13 @@ class BurgerBuilder extends Component {
       const newTotalPrice = oldTotalPrice - deductedPrice;
 
       // Update the state with the new values
-      this.setState({
-        ingredients: updatedIngredients,
-        totalPrice: newTotalPrice
-      });
+      this.setState(
+        {
+          ingredients: updatedIngredients,
+          totalPrice: newTotalPrice
+        },
+        this.updatePurchaseState
+      );
     }
   };
 
@@ -105,6 +127,7 @@ class BurgerBuilder extends Component {
           addIngredient={this.addIngredientHandler}
           removeIngredient={this.removeIngredientHandler}
           disabledStatus={disabledStatus}
+          isPurchasable={this.state.isPurchasable}
           price={this.state.totalPrice}
         />
       </Fragment>
