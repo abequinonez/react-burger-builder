@@ -117,6 +117,10 @@ class BurgerBuilder extends Component {
     this.setState({ viewOrder: false });
   };
 
+  continueToCheckoutHandler = () => {
+    alert('Checkout coming soon!');
+  };
+
   render() {
     /*
     Using the ingredients object as a template, create a new object that
@@ -134,7 +138,11 @@ class BurgerBuilder extends Component {
     return (
       <Fragment>
         <Modal show={this.state.viewOrder} hideOrder={this.hideOrderHandler}>
-          <OrderSummary ingredients={this.state.ingredients} />
+          <OrderSummary
+            ingredients={this.state.ingredients}
+            hideOrder={this.hideOrderHandler}
+            continueToCheckout={this.continueToCheckoutHandler}
+          />
         </Modal>
         <Burger ingredients={this.state.ingredients} />
         <BuildControls
