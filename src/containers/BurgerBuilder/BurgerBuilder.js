@@ -4,6 +4,7 @@ import Burger from '../../components/Burger/Burger';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
 import Modal from '../../components/UI/Modal/Modal';
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
+import Spinner from '../../components/UI/Spinner/Spinner';
 import axios from '../../axios-orders';
 
 const INGREDIENT_PRICES = {
@@ -25,7 +26,8 @@ class BurgerBuilder extends Component {
       },
       totalPrice: 4,
       isPurchasable: false,
-      viewOrder: false
+      viewOrder: false,
+      loading: false
     };
   }
 
@@ -124,6 +126,8 @@ class BurgerBuilder extends Component {
     for now.
     */
 
+    this.setState({ loading: true });
+
     // Prepare the order data to be sent
     const order = {
       ingredients: this.state.ingredients,
@@ -143,8 +147,8 @@ class BurgerBuilder extends Component {
     // Send the data
     axios
       .post('/orders.json', order)
-      .then(res => console.log(res))
-      .catch(err => console.log(err));
+      .then(res => this.setState({ loading: false, viewOrder: false }))
+      .catch(err => this.setState({ loading: false, viewOrder: false }));
   };
 
   render() {
@@ -161,15 +165,27 @@ class BurgerBuilder extends Component {
       disabledStatus[ingKey] = disabledStatus[ingKey] <= 0;
     }
 
+    let orderSummary = (
+      <OrderSummary
+        ingredients={this.state.ingredients}
+        price={this.state.totalPrice}
+        hideOrder={this.hideOrderHandler}
+        continueToCheckout={this.continueToCheckoutHandler}
+      />
+    );
+
+    /*
+    Instead of the OrderSummary component, show a spinner if the loading state
+    property is set to true.
+    */
+    if (this.state.loading) {
+      orderSummary = <Spinner />;
+    }
+
     return (
       <Fragment>
         <Modal show={this.state.viewOrder} hideOrder={this.hideOrderHandler}>
-          <OrderSummary
-            ingredients={this.state.ingredients}
-            price={this.state.totalPrice}
-            hideOrder={this.hideOrderHandler}
-            continueToCheckout={this.continueToCheckoutHandler}
-          />
+          {orderSummary}
         </Modal>
         <Burger ingredients={this.state.ingredients} />
         <BuildControls
